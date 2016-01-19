@@ -1,27 +1,15 @@
-#
-# Haproxy Dockerfile
-#
-#
-
-# Pull base image.
-FROM debian:jessie
+FROM alpine:3.3
 
 # Install Haproxy.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    haproxy
+RUN apk add --no-cache \
+    haproxy \
+    && rm -rf /etc/haproxy/haproxy.cfg
 
 # Add files.
-ADD haproxy.cfg /etc/haproxy/haproxy.cfg
-ADD start.bash /haproxy-start
-
-# Define mountable directories.
-VOLUME ["/haproxy-override"]
-
-# Define working directory.
-WORKDIR /etc/haproxy
+COPY haproxy.cfg /etc/haproxy/haproxy.cfg
 
 # Define default command.
-CMD ["bash", "/haproxy-start"]
+CMD [ "/usr/sbin/haproxy", "-f", "/etc/haproxy/haproxy.cfg", "-db" ]
 
 # Expose ports.
 EXPOSE 80
